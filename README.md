@@ -1,44 +1,42 @@
-# Test
-Test
-import ReactCSSTransitionGroup from 'react-transition-group'; // ES6
-var ReactCSSTransitionGroup = require('react-transition-group'); // ES5 with npm
-class TodoList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {items: ['hello', 'world', 'click', 'me']};
-    this.handleAdd = this.handleAdd.bind(this);
-  }
+import {
+  Color, PerspectiveCamera, Quaternion, Scene, Vector3, WebGLRenderer
+} from 'three';
+import Raymarcher from 'three-raymarcher';
 
-  handleAdd() {
-    const newItems = this.state.items.concat([
-      prompt('Enter some text')
-    ]);
-    this.setState({items: newItems});
-  }
+const aspect = window.innerWidth / window.innerHeight;
+const camera = new PerspectiveCamera(70, aspect, 0.01, 1000);
+const renderer = new WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-  handleRemove(i) { 
-    let newItems = this.state.items.slice();
-    newItems.splice(i, 1);
-    this.setState({items: newItems});
-  }
+const scene = new Scene();
+const raymarcher = new Raymarcher({
+  entities: [
+    {
+      color: new Color(0x0000FF),
+      position: new Vector3(-1.5, 0, -4),
+      rotation: new Quaternion(0, 0, 0, 1),
+      scale: new Vector3(1, 1, 1),
+      shape: Raymarcher.shapes.box,
+    },
+    {
+      color: new Color(0x00FF00),
+      position: new Vector3(0, 0, -4),
+      rotation: new Quaternion(0, 0, 0, 1),
+      scale: new Vector3(0.5, 1, 0.5),
+      shape: Raymarcher.shapes.capsule,
+    },
+    {
+      color: new Color(0xFF0000),
+      position: new Vector3(1.5, 0, -4),
+      rotation: new Quaternion(0, 0, 0, 1),
+      scale: new Vector3(1, 1, 1),
+      shape: Raymarcher.shapes.sphere,
+    }
+  ],
+});
+scene.add(raymarcher);
 
-  render() {
-    const items = this.state.items.map((item, i) => (
-      <div key={i} onClick={() => this.handleRemove(i)}>
-        {item}
-      </div>
-    ));
-
-    return (
-      <div>
-        <button onClick={this.handleAdd}>Add Item</button>
-        <ReactCSSTransitionGroup
-          transitionName="example"
-          transitionEnterTimeout={500}
-          transitionLeaveTimeout={300}>
-          {items}
-        </ReactCSSTransitionGroup>
-      </div>
-    );
-  }
-}
+renderer.setAnimationLoop(() => (
+  renderer.render(scene, camera)
+));
